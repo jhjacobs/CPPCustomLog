@@ -15,7 +15,9 @@
 #include <thread>
 #include <mutex>
 #include <stdio.h>
-
+#include <boost/property_tree/xml_parser.hpp>
+#include <boost/property_tree/ptree.hpp>
+#include <boost/foreach.hpp>
 
 using namespace std;
 
@@ -54,7 +56,7 @@ void PdoCompress(string fileName, CmpType ct)
 		cmd << "gzip " << "-f " << fileName << " 2<&1";
 	}
 	else if(ct == BZ2) {
-		// cmd << "tar -cvjf " << fileName << ".bz2 " << fileName << " 2<&1";
+		cmd << "tar -cvjf " << fileName << ".bz2 " << fileName << " 2<&1";
 	}
 	tarResStream = popen(cmd.str().c_str(), "r");
 	char outch;
@@ -156,10 +158,16 @@ CustomLogger::CustomLogger(DbgLevel lvl,
 		logLevel(lvl),
 		logFileLocation(location),
 		rotateFiles(rFiles),
-		rotateSize(rSize),
+		rotateFileSize(rSize),
 		directoryCreated(dirCreated),
 		curRotateNum(0)
 {
+	stringToDebugLevel["Verbose"] = Verbose;
+	stringToDebugLevel["Debug"] = Debug;
+	stringToDebugLevel["Info"] = Info;
+	stringToDebugLevel["Error"] = Error;
+	stringToDebugLevel["Custom"] = Custom;
+
 }
 
 mutex logMutex;
@@ -204,7 +212,7 @@ void CustomLogger::Log(DbgLevel lvl, string msg)
         logFile << timeString << "."<< tv.tv_usec << ": " << msg << /* "\n" */ endl;
         logFile.close();
 	}
-	if( GetLogFileSize() > rotateSize )
+	if( GetLogFileSize() > rotateFileSize )
 	{
 
 		thread rotateThread(Rotate, logFileLocation, curRotateNum);
@@ -287,4 +295,32 @@ string CustomLogger::GetFileName(string location)
 	vector<string> pathPieces;
 	Splitter(location, pathPieces, "/");
 	return(pathPieces[pathPieces.size() - 1]);
+}
+
+void CustomLogger::GetSettingsFromXml(void)
+{
+	using boost::property_tree::ptree;
+
+	ptree pt;
+	read_xml("/home/jeff/eclipse-workspace/FirstCpp/src/FirstPrj.xml", pt);
+	BOOST_FOREACH( ptree::value_type const& v, pt.get_child("CustomLogger") ) {
+		if( v.first == "debugLevel" ) {
+			string check = v.second.get_value<string>();
+			if(stringToDebugLevel.find(check) == stringToDebugLevel.end())
+			{
+				cout << "invalid debugLevel " << check;
+				return;
+			}
+			this->logLevel = stringToDebugLevel[check];
+		}
+		else if( v.first == "logFileLocation" ) {
+			this->logFileLocation = v.second.get_value<string>();
+		}
+		else if( v.first == "rotateFiles" ) {
+			this->rotateFiles = atoi(v.second.get_value<string>().c_str());
+		}
+		else if( v.first == "rotateFileSize") {
+			this->rotateFileSize = atoi(v.second.get_value<string>().c_str());
+		}
+	}
 }

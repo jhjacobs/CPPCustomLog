@@ -19,6 +19,7 @@
 #include <string.h>
 #include <assert.h>
 #include <zlib.h>
+#include <map>
 
 using namespace std;
 enum DbgLevel { Verbose, Debug, Info, Error, Custom };
@@ -29,17 +30,19 @@ class CustomLogger
 	DbgLevel logLevel;
 	string logFileLocation;
 	uint32_t rotateFiles;
-	uint32_t rotateSize;
+	uint32_t rotateFileSize;
 	bool directoryCreated;
 	uint32_t curRotateNum;
+
+	map<string, DbgLevel> stringToDebugLevel;
 
 	static void Rotate(string location, uint32_t rotateNum);
 
 	public:
 	CustomLogger(DbgLevel lvl = Error,
 			string location = "./FirstLog/Log.txt",
-			uint32_t rFiles = 10,
-			uint32_t rSize = 75,
+			uint32_t rFiles = 100,
+			uint32_t rSize = 10000,
 			bool dirCreated = false);
 	void Log(DbgLevel lvl, string msg);
 	void SetLogLevel(DbgLevel lvl);
@@ -51,6 +54,8 @@ class CustomLogger
 	string GetLogFileDir(void);
 	uint64_t GetLogFileSize(void);
 	static string GetFileName(string location);
+	void GetSettingsFromXml(void);
+
 };
 
 #endif /* CUSTOMLOGGER_H_ */

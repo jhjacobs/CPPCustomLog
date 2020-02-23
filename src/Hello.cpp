@@ -18,6 +18,7 @@ int main(int argc, char *argv[])
 	cout << "argv[0] " << argv[0] << endl;
 	int i = 0;
 	CustomLogger myCLogger;
+	myCLogger.GetSettingsFromXml();
 	stringstream msg;
 
 	for( i = 0; i < 200; i++ ) {

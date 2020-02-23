@@ -1,0 +1,8 @@
+<?xml version="1.0"?>
+<CustomLogger>
+  <version>1</version>
+  <debugLevel>Debug</debugLevel>
+  <logFileLocation>/usr/local/FirstLog/Log.txt</logFileLocation>
+  <rotatateFiles>125</rotatateFiles>>
+  <rotateFileSize>100237</rotateFileSize>>
+</CustomLogger>
