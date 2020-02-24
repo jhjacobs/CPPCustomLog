@@ -302,7 +302,9 @@ void CustomLogger::GetSettingsFromXml(void)
 	using boost::property_tree::ptree;
 
 	ptree pt;
-	read_xml("/home/jeff/eclipse-workspace/FirstCpp/src/FirstPrj.xml", pt);
+	// read_xml("/home/jeff/eclipse-workspace/FirstCpp/src/FirstPrj.xml", pt);
+	read_xml("./CustomLoggerSettings.xml", pt);
+
 	BOOST_FOREACH( ptree::value_type const& v, pt.get_child("CustomLogger") ) {
 		if( v.first == "debugLevel" ) {
 			string check = v.second.get_value<string>();
