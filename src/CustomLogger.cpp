@@ -177,7 +177,7 @@ void CustomLogger::Log(DbgLevel lvl, string msg)
     if(!directoryCreated)
     {
     	string logFileDir = GetLogFileDir();
-
+    	cout << "In log logFileDir: " << logFileDir << endl;
     	int res = mkdir(logFileDir.c_str(), S_IRWXU | S_IRGRP | S_IROTH);
         if( res == -1 )
         {
@@ -300,6 +300,12 @@ string CustomLogger::GetFileName(string location)
 void CustomLogger::GetSettingsFromXml(void)
 {
 	using boost::property_tree::ptree;
+	struct stat buffer;
+	// Check if the xml file exists.
+	if (stat("./CustomLoggerSettings.xml", &buffer) != 0) {
+		cout << "CustomLoggerSettings.xml not found." << endl;
+		return;
+	}
 
 	ptree pt;
 	// read_xml("/home/jeff/eclipse-workspace/FirstCpp/src/FirstPrj.xml", pt);
@@ -314,15 +320,19 @@ void CustomLogger::GetSettingsFromXml(void)
 				return;
 			}
 			this->logLevel = stringToDebugLevel[check];
+			cout << "logLevel set in GetSettingsFromXml: " << logLevel << endl;
 		}
 		else if( v.first == "logFileLocation" ) {
 			this->logFileLocation = v.second.get_value<string>();
+			cout << "logFileLocation in GetSettingsFromXml: " << logFileLocation << endl;
 		}
 		else if( v.first == "rotateFiles" ) {
 			this->rotateFiles = atoi(v.second.get_value<string>().c_str());
+			cout << "rotateFiles in GetsettingsFromXml: " << rotateFiles << endl;
 		}
 		else if( v.first == "rotateFileSize") {
 			this->rotateFileSize = atoi(v.second.get_value<string>().c_str());
+			cout << "rotateFileSize in GetSettingsFromXml: " << rotateFileSize << endl;
 		}
 	}
 }
