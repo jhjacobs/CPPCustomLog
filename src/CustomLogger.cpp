@@ -50,24 +50,25 @@ enum CmpType {GZIP, BZ2};
 void PdoCompress(string fileName, CmpType ct)
 {
 	stringstream cmd;
-	FILE *tarResStream;
+	FILE *zipResStream;
 	if(ct == GZIP) {
 		// cmd << "tar -cvzf " << fileName << ".gz " << fileName << " 2<&1";
 		cmd << "gzip " << "-f " << fileName << " 2<&1";
 	}
 	else if(ct == BZ2) {
-		cmd << "tar -cvjf " << fileName << ".bz2 " << fileName << " 2<&1";
+		// cmd << "tar -cvjf " << fileName << ".bz2 " << fileName << " 2<&1";
+		cmd << "bzip2 " << "-f " << fileName << " 2<&1";
 	}
-	tarResStream = popen(cmd.str().c_str(), "r");
+	zipResStream = popen(cmd.str().c_str(), "r");
 	char outch;
 	do {
-		outch = fgetc(tarResStream);
+		outch = fgetc(zipResStream);
 		cout << outch;
-		if( feof(tarResStream) )
+		if( feof(zipResStream) )
 			break;
 	}while ( 1 );
 
-	fclose(tarResStream);
+	fclose(zipResStream);
 }
 
 uint32_t doDef(FILE *source, FILE *dest, int32_t level)
